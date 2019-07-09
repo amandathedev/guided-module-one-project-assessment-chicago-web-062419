@@ -12,6 +12,8 @@ class Passenger < ActiveRecord::Base
     end
   end
 
+  #   Passenger#new_booking allows the passenger to make buy a new ticket
+
   # Passenger#booking_destinations returns a list of all destinations for booked tickets
 
   def booking_destinations
