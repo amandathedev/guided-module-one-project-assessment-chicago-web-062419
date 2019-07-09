@@ -11,6 +11,7 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema.define(version: 3) do
+
   create_table "journeys", force: :cascade do |t|
     t.integer "train_number"
     t.string "origin"
@@ -30,8 +31,9 @@ ActiveRecord::Schema.define(version: 3) do
 
   create_table "tickets", force: :cascade do |t|
     t.integer "passenger_id"
-    t.integer "train_id"
+    t.integer "journey_id"
     t.integer "ticket_number"
     t.integer "price"
   end
+
 end
