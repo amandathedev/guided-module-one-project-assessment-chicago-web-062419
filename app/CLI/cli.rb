@@ -1,4 +1,10 @@
 require "artii"
+require "tty-prompt"
+require "rainbow"
+# require "pastel"
+# https://www.rubydoc.info/gems/tty-color
+
+@prompt = TTY::Prompt.new
 
 # Input
 def get_input
@@ -12,45 +18,47 @@ end
 
 # Welcome
 def welcome
-  #   puts <<-DESK
-
-  #     DESK
+  puts `clear`
   welcome_message = Artii::Base.new
-  puts welcome_message.asciify("Welcome!")
-  puts "Are you a passenger?"
-  user_type = get_input()
-  if user_type == "yes"
+  welcome_message = welcome_message.asciify("Welcome!")
+  puts Rainbow(welcome_message).blueviolet
+  user_input = @prompt.select(Rainbow("Are you a passenger or an employee?").royalblue, ["Passenger", "Employee"])
+  if user_input == "Passenger"
     help_choice()
-  elsif user_type == "no"
+  elsif user_input == "Employee"
     employee_choice()
   else
-    puts "Please enter a valid input."
+    goodbye()
   end
 end
 
 # Goodbye
 def goodbye
+  puts `clear`
   goodbye_message = Artii::Base.new
-  puts goodbye_message.asciify("Goodbye!")
+  goodbye_message = goodbye_message.asciify("Goodbye!")
+  puts Rainbow(goodbye_message).royalblue
 end
 
 # Help choice
 def help_choice
-  puts "What can I help you with?"
-  choices = <<-CHOICE
-    1: View all my tickets
-    2: Make a new reservation
-    3: Change my reservation
-    4: Upgrade to first class
-    5: Cancel my reservation
-    6: Exit
-CHOICE
+  puts `clear`
+  passenger_message = Artii::Base.new
+  puts passenger_message.asciify("Passenger Portal")
+  choices = @prompt.select("What can I help you with?", ["View my current reservations", "Make a new reservation", "Change my reservation", "Upgrade to first class", "Cancel my reservation", "Exit"])
   puts choices
-  user_choice = get_input()
-  if user_choice == "1"
+  if choices == "View my current reservations"
     view_bookings()
-  elsif user_choice == "2"
+  elsif choices == "Make a new reservation"
     new_booking()
+  elsif choices == "Change my reservation"
+    # Change reservation
+  elsif choices == "Upgrade to first class"
+    # Upgrade
+  elsif choices == "Cancel my reservation"
+    # Cancel
+  else
+    goodbye()
   end
 end
 
@@ -70,8 +78,8 @@ end
 
 # More help
 def more_help
-  puts "Is there anything else I can help you with today?"
-  if get_input == "yes"
+  help_option = @prompt.select("Is there anything else I can help you with today?", ["Yes", "No"])
+  if help_option == "Yes"
     help_choice()
   else
     goodbye()
@@ -100,17 +108,27 @@ def new_booking
     # Restart only this question
     luggage_input = gets.chomp.to_i
   end
+  #   Fix
+  Passenger.new_booking
+end
+
+# Change reservation
+def change_reservation
+end
+
+# Upgrade
+def upgrade
+end
+
+# Cancel reservation
+def cancel_reservation
 end
 
 # Employee choice
 def employee_choice
-  puts "What can I help you with?"
-  employee_choices = <<-CHOICE
-  - 1: View a list of all the passengers on my train
-  - 2: View the most popular destination
-  - 3: View a list of the passengers with the most tickets booked
-  - 4: Cancel the upcoming train journey
-  - 5: Exit
-CHOICE
+  puts `clear`
+  employee_message = Artii::Base.new
+  puts employee_message.asciify("Staff Portal")
+  employee_choices = @prompt.select("What can I help you with?", ["View a list of all the passengers on my train", "MView the most popular destination", "View a list of the passengers with the most tickets booked", "Cancel the upcoming train journey", "Exit"])
   puts employee_choices
 end
