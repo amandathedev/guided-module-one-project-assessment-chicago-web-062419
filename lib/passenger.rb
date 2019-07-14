@@ -9,89 +9,105 @@ class Passenger < ActiveRecord::Base
     TTY::Prompt.new
   end
 
-  # Passenger#bookings returns a list of the current passenger's booked tickets
-
-  def ticket_info
-    # # Fix
-    # self.tickets.map do |ticket|
-    #   ticket.destinations
-    # end
+  def artii
+    Artii::Base.new
   end
 
-  def first_class_interpret
-    # Fix or delete
-    self.passengers.map do |passenger|
-      if passenger.first_class? == true
-        return "First Class"
-      else
-        return "Economy Class"
-      end
-    end
+  def passenger_banner
+    puts `clear`
+    puts passenger_message = artii.asciify("Passenger Portal")
   end
 
+  def train
+    puts train = <<-TRAIN
+                     .---._
+             .--(. '  .).--.      . .-.
+          . ( ' _) .)` (   .)-. ( ) '-'
+         ( ,  ).        `(' . _)
+       (')  _________      '-'
+       ____[_________]                                         ________
+       \\__/ | _ \\  ||    ,;,;,,                               [________]
+       _][__|(")/__||  ,;;;;;;;;,   __________   __________   _| LILI |_
+      /             | |____      | |          | |  ___     | |      ____|
+     (| .--.    .--.| |     ___  | |   |  |   | |      ____| |____      |
+     /|/ .. \\~~/ .. \\_|_.-.__.-._|_|_.-:__:-._|_|_.-.__.-._|_|_.-.__.-._|
+  +=/_|\\ '' /~~\\ '' /=+( o )( o )+==( o )( o )=+=( o )( o )+==( o )( o )=+=
+  ='=='='--'==+='--'===+'-'=='-'==+=='-'+='-'===+='-'=='-'==+=='-'=+'-'jgs+
+    TRAIN
+  end
+
+  # Read
   def bookings
     if self.tickets.count > 0
-      puts `clear`
-      passenger_message = Artii::Base.new
-      puts passenger_message.asciify("Passenger Portal")
-      puts "Here is a list of your tickets: \n \n"
+      passenger_banner()
+      puts "Here is a list of your tickets:"
       self.journeys.map do |journey|
-        # Fix: Add incrementing numbers, stop duplication, add first class interpolation
         puts "You will be traveling from #{journey.origin} to #{journey.destination} on #{journey.date}. Your train, number #{journey.train_number}, will make #{journey.num_of_stops} stop(s) along the route."
-        # end
       end
+      more_help()
     else
       puts "You don't have any bookings. Please return to the main menu to make a new reservation."
       more_help()
     end
   end
 
-  # end
-
-  def change_bookings
+  # Update
+  def upgrade
     if self.tickets.count > 0
-      puts `clear`
-      passenger_message = Artii::Base.new
-      puts passenger_message.asciify("Passenger Portal")
-      puts "Here is a list of your tickets: \n \n"
+      passenger_banner()
+      puts "Here is a list of your tickets:"
       change_options = self.journeys.map do |journey|
-        # puts "You will be traveling from #{journey.origin} to #{journey.destination} on #{journey.date}."
-        # end
         "#{journey.origin} to #{journey.destination} on #{journey.date}"
       end
+      passenger_banner()
       change_select = prompt.select("Which reservation would you like to change?", change_options)
-      # puts change_input
+      passenger_banner()
+      puts "The cost to upgrade this journey is $#{rand(25..100)}."
+      upgrade_select = prompt.select("Would you like to proceed with the upgrade?", ["Yes", "No"])
+      if upgrade_select == "Yes"
+        money = <<-MONEY
+        ||====================================================================||
+        ||//$\\\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\//$\\\\||
+        ||(100)==================| FEDERAL RESERVE NOTE |================(100)||
+        ||\\\\$//        ~         '------========--------'                \\\\$//||
+        ||<< /        /$\\              // ____ \\\\                         \\ >>||
+        ||>>|  12    //L\\\\            // ///..) \\\\         L38036133B   12 |<<||
+        ||<<|        \\\\ //           || <||  >\\  ||                        |>>||
+        ||>>|         \\$/            ||  $$ --/  ||        One Hundred     |<<||
+     ||====================================================================||>||
+     ||//$\\\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\//$\\\\||<||
+     ||(100)==================| FEDERAL RESERVE NOTE |================(100)||>||
+     ||\\\\$//        ~         '------========--------'                \\\\$//||\\||
+     ||<< /        /$\\              // ____ \\\\                         \\ >>||)||
+     ||>>|  12    //L\\\\            // ///..) \\\\         L38036133B   12 |<<||/||
+     ||<<|        \\\\ //           || <||  >\\  ||                        |>>||=||
+     ||>>|         \\$/            ||  $$ --/  ||        One Hundred     |<<||
+     ||<<|      L38036133B        *\\\\  |\\_/  //* series                 |>>||
+     ||>>|  12                     *\\\\/___\\_//*   1989                  |<<||
+     ||<<\\      Treasurer     ______/Franklin\\________     Secretary 12 />>||
+     ||//$\\                 ~|UNITED STATES OF AMERICA|~               /$\\\\||
+     ||(100)===================  ONE HUNDRED DOLLARS =================(100)||
+     ||\\\\$//\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\\\$//||
+     ||====================================================================||
+        MONEY
+        puts "#{money}"
+        self.update(first_class?: true)
+        sleep(3)
+        puts "\n Thank you for your purchase!"
+        sleep(2)
+        enjoy_banner()
+        train()
+      else
+        # puts "You don't have any bookings. Please return to the main menu to make a new reservation."
+        # more_help()
+      end
     else
       puts "You don't have any bookings. Please return to the main menu to make a new reservation."
       more_help()
     end
-  end
-
-  # end
-
-  # end
-
-  # Passenger#new_booking allows the passenger to make buy a new ticket
-
-  def new_booking
-    # Fix
-    new_ticket = Ticket.create(self.id)
-  end
-
-  # Passenger#change_reservation allows a passenger to modify a ticket (destination)
-
-  def change_reservation
-  end
-
-  # Passenger#upgrade allows a passenger to change their ticket to first-class
-
-  def upgrade
-  end
-
-  # Passenger#refund allows a passenger to cancel their reservation
-
-  def refund
   end
 end
 
-# end
+# Stretch goals: Validations, destination list for new bookings
+# Struggles: update method name, calling methods with relation to scope, getting the right ID from the join table and not the models, embedded methods
+# Learned: using gems, behavior-driven development, seeding database

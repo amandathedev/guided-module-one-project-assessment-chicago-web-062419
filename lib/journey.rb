@@ -1,4 +1,9 @@
+require "artii"
 require "tty-prompt"
+require "rainbow"
+require "tty-progressbar"
+require "tty-spinner"
+require "table_print"
 
 class Journey < ActiveRecord::Base
   has_many :tickets
@@ -6,7 +11,6 @@ class Journey < ActiveRecord::Base
 
   @prompt = TTY::Prompt.new
 
-  # More help
   def more_help
     help_option = @prompt.select("Is there anything else I can help you with today?", ["Yes", "No"])
     if help_option == "Yes"
@@ -16,19 +20,20 @@ class Journey < ActiveRecord::Base
     end
   end
 
-  #   Journey#passenger_list returns a list of passengers with tickets on this journey
-
-  def passenger_list
+  # Read
+  def self.all_trains
+    staff_banner()
+    tp self.all
+    sleep(3)
+    more_help()
   end
 
-  #   Journey#most_popular_destination returns the most popular destination
-
+  # Read
   def self.most_popular_destination
     staff_banner()
     popular_destination_hash = Ticket.group(:journey_id).order("count_id ASC").limit(6).count(:id)
     puts "Here are the most popular destinations:"
     popular_destination_hash.select do |journey_id|
-      # binding.pry
       unless journey_id == nil
         puts Journey.find(journey_id).destination
       end
@@ -36,8 +41,7 @@ class Journey < ActiveRecord::Base
     more_help()
   end
 
-  #   Journey#rewards_members returns a list of the 5 passengers with the most journeys traveled
-
+  # Read
   def self.rewards_members
     staff_banner()
     rewards_members_hash = Ticket.group(:passenger_id).order("count_id DESC").limit(5).count(:id)
